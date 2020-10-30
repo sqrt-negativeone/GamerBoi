@@ -153,6 +153,7 @@
     <ClCompile Include="Debugger.cpp" />
     <ClCompile Include="DMA.cpp" />
     <ClCompile Include="IORegisters.cpp" />
+    <ClCompile Include="Joypad.cpp" />
     <ClCompile Include="MBC.cpp" />
     <ClCompile Include="MBC0.cpp" />
     <ClCompile Include="MBC1.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Debugger.h" />
     <ClInclude Include="DMA.h" />
     <ClInclude Include="IORegisters.h" />
+    <ClInclude Include="Joypad.h" />
     <ClInclude Include="MBC.h" />
     <ClInclude Include="MBC0.h" />
     <ClInclude Include="MBC1.h" />

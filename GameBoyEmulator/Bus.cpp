@@ -7,6 +7,7 @@ Bus::Bus() {
 	cpu.connectBus(this);
 	timer.connectBus(this);
 	io_registers.connectBus(this);
+	joypad.connectBus(this);
 
 	memset(cpuRam, 0x00, sizeof(cpuRam));
 	memset(h_ram, 0x00, sizeof(h_ram));
@@ -117,4 +118,5 @@ void Bus::reset() {
 	io_registers.reset();
 	ppu.reset();
 	timer.reset();
+	joypad.reset();
 }

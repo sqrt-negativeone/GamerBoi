@@ -11,6 +11,7 @@ IORegisters::IORegisters() {
 }
 void IORegisters::reset()
 {
+	
 	io_registers[0x05] = 0x00;//TIMA
 	io_registers[0x06] = 0x00;//TMA
 	io_registers[0x07] = 0x00;//TAC
@@ -35,6 +36,7 @@ void IORegisters::reset()
 	io_registers[0x40] = 0x91;//LCDC
 	io_registers[0x42] = 0x00;//SCY
 	io_registers[0x43] = 0x00;//SCX
+	io_registers[0x44] = 0x00;//LY
 	io_registers[0x45] = 0x00;//LYC
 	io_registers[0x47] = 0xFC;//BGP
 	io_registers[0x48] = 0xFF;//OBP0
@@ -49,7 +51,7 @@ uint8_t IORegisters::read(uint16_t addr) {
 	switch (addr)
 	{
 	case 0xFF00: {//Joypad
-		return (0xC0 | (io_registers[0] & 37));
+		return bus->joypad.read();;
 	}
 	case 0xFF04: { //DIV : clock divider
 		return bus->timer.read_DIV();
@@ -100,8 +102,7 @@ void IORegisters::write(uint16_t addr, uint8_t data) {
 	switch (addr)
 	{
 	case 0xFF00: {//Joypad
-		uint8_t old = io_registers[0x00];
-		io_registers[0x00] = (0xC0 | (data & 0x30) | (old & 0x0F));
+		bus->joypad.write(data);
 		break;
 	}
 	case 0xFF04: { //DIV : clock divider
@@ -137,7 +138,9 @@ void IORegisters::write(uint16_t addr, uint8_t data) {
 			data &= ~(1 << 5);
 		}
 		if ((data & (1 << 7)) == 0) {
+			//turning off the screen
 			io_registers[0x44] = 0;
+			bus->ppu.turnedOff();
 		}
 		break;
 	}

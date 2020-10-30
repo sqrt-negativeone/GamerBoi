@@ -7,7 +7,6 @@ DMA::DMA(Bus* bus) {
 }
 void DMA::startDMA() {
 	curr_addr = bus->read(0x46);
-	printf("DMA started at PC : %04X, from address %04X\n", bus->cpu.reg.PC, curr_addr);
 	if (curr_addr > 0xF1) return;
 	curr_addr <<= 8;
 	is_running = true;

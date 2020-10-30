@@ -4,6 +4,7 @@
 #include "Cartridge.h"
 #include "PPU.h"
 #include "IORegisters.h"
+#include "Joypad.h"
 
 class Bus
 {
@@ -31,6 +32,7 @@ public:
 	CPU2 cpu;
 	Cartridge* cartridge;
 	IORegisters io_registers;
+	Joypad joypad;
 private:
 	bool is_booting;	
 	

@@ -30,6 +30,8 @@ public :
 
 	uint8_t screen[144][160][3];
 	void clock();
+
+	
 	
 	void connectBus(Bus* bus);
 	void reset();
@@ -43,8 +45,22 @@ public :
 	unsigned int frame_count;
 	uint8_t get_mode();
 	uint8_t get_coincidence();
+	void turnedOff();
 private:
-	
+	union {
+		uint8_t val;
+		struct {
+			uint8_t bg_display : 1;
+			uint8_t OBJ_display : 1;
+			uint8_t OBJ_size : 1;
+			uint8_t BG_tilemap : 1;
+			uint8_t BG_WD_tiledata : 1;
+			uint8_t WD_display : 1;
+			uint8_t WD_tilemap : 1;
+			uint8_t lcd_on : 1;
+		};
+	} LCDC_reg;
+	uint8_t curr_scanline;
 	enum class STATE {
 		HBLANK,
 		VBLANK,
@@ -76,7 +92,7 @@ private:
 	STATE mode;
 	uint8_t coincidenceFlag;
 	uint16_t clock_cnt;
-	void drawScanline(uint8_t curr_scanline);
+	void drawScanline();
 
 	SDL_Renderer* renderer;
 	SDL_Window* window;
@@ -88,13 +104,11 @@ private:
 	vector<Sprite> spriteBuffer;
 
 	void doOAM_search();
-	void drawBackground(uint8_t curr_scanline);
-	void drawWindow(uint8_t curr_scanline);
-	void drawSprite(uint8_t curr_scanline);
-	
-	bool isLcdOn();
-	bool isBackgroundEnable();
-	bool isWindowEnable();
-	bool isSpriteEnable();
+	void drawBackground();
+	void drawWindow();
+	void drawSprite();
+
+	void render();
+	bool isOff;
 };
 

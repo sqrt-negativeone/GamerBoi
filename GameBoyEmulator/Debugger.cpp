@@ -141,9 +141,9 @@ void Debugger::showVram(uint16_t start, uint16_t line_count) {
 	_getch();
 }
 void Debugger::showRegisters() {
-	printf("AF : %04X, BC : %04X, DE : %04X, HL : %04X, PC : %04X, SP : %04X \nSTAT : %02X, LCDC : %02X\nIME : %01X, IE : %04X, IF : %04X\n",
+	printf("AF : %04X, BC : %04X, DE : %04X, HL : %04X, PC : %04X, SP : %04X \nSTAT : %02X, LCDC : %02X\nIME : %01X, IE : %02X, IF : %02X\nLY : %02X\n",
 		bus->cpu.reg.AF.hl, bus->cpu.reg.BC.hl, bus->cpu.reg.DE.hl, bus->cpu.reg.HL.hl, bus->cpu.reg.PC, bus->cpu.reg.SP.hl,
-		bus->read(0xFF41), bus->read(0xFF40), bus->cpu.get_IME(), bus->read(0xFFFF), bus->read(0xFF0F));
+		bus->read(0xFF41), bus->read(0xFF40), bus->cpu.get_IME(), bus->read(0xFFFF), bus->read(0xFF0F), bus->read(0xFF44));
 }
 void Debugger::ShowOptions() {
 	printf("choose one of the following options\n-reset to reset\n-r to run\n-sbp to show break points\n-rf to run one frame\n-ri to run one instruction\n-so to show OAM\n");
