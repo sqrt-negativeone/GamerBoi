@@ -178,6 +178,13 @@
     <ClInclude Include="PPU.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Desktop\cpu instr tests.PNG" />
+    <Image Include="..\..\..\..\Desktop\Dr Mario.PNG" />
+    <Image Include="..\..\..\..\Desktop\instr timing.PNG" />
+    <Image Include="..\..\..\..\Desktop\super mario land.PNG" />
+    <Image Include="..\..\..\..\Desktop\Tetris.PNG" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

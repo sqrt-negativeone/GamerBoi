@@ -9,7 +9,7 @@ PPU::PPU() {
 	frame_count = 0;
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-	window = SDL_CreateWindow("GB Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 432, 0);
+	window = SDL_CreateWindow("Gamer Boi (Emulator)", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 432, 0);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STATIC, 160, 144);
 	SDL_SetWindowResizable(window, SDL_TRUE);

@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="images">
+      <UniqueIdentifier>{e7bd5576-d468-404c-adb5-9001ad5272b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPU.cpp">
@@ -104,5 +107,22 @@
     <ClInclude Include="Joypad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Desktop\instr timing.PNG">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Desktop\super mario land.PNG">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Desktop\Tetris.PNG">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Desktop\cpu instr tests.PNG">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Desktop\Dr Mario.PNG">
+      <Filter>images</Filter>
+    </Image>
   </ItemGroup>
 </Project>
