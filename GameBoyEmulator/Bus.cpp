@@ -20,7 +20,7 @@ Bus::Bus() {
 Bus::~Bus(){}
 
 uint8_t Bus::read(uint16_t addr) {
-	if (ppu.dma->is_running && !(0xFF80 <= addr && addr < 0xFFFF)) {// don't read when DMA transfer
+	if (ppu.dma->is_running && (0xFF00 > addr)) {// don't read when DMA transfer
 		return 0xFF;
 	}
 	if ((0x0000 <= addr && addr < 0x8000) || (0xA000 <= addr && addr < 0xC000)) {//read from ROM or external RAM
@@ -57,7 +57,7 @@ uint8_t Bus::read(uint16_t addr) {
 }
 void Bus::write(uint16_t addr, uint8_t data) {
 	
-	if (ppu.dma->is_running && !(0xFF80 <= addr && addr < 0xFFFF)) {// don't write when DMA transfer
+	if (ppu.dma->is_running && (0xFF00 > addr)) {// don't write when DMA transfer
 		return;
 	}
 	//write to ROM or external RAM (writing to rom causes the MBC to change banks)
@@ -100,8 +100,10 @@ void Bus::write(uint16_t addr, uint8_t data) {
 void Bus::clock() {
 	cpu.clock();
 	ppu.clock();
+	ppu.dma->clock();
 	timer.update();
 	cpu.handle_intr();
+
 }
 
 void Bus::interrupt_req(uint8_t req) {

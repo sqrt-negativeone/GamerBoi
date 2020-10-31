@@ -6,7 +6,7 @@ DMA::DMA(Bus* bus) {
 	remaining_clocks = 0;
 }
 void DMA::startDMA() {
-	curr_addr = bus->read(0x46);
+	curr_addr = bus->read(0xff46);
 	if (curr_addr > 0xF1) return;
 	curr_addr <<= 8;
 	is_running = true;
