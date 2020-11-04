@@ -114,3 +114,34 @@ uint8_t Joypad::read() {
 
 	return res;
 }
+bool Joypad::get_key_state(BUTTONS button) {
+	switch (button)
+	{
+	case Joypad::BUTTONS::UP:
+		return buttons_state.up;
+		break;
+	case Joypad::BUTTONS::DOWN:
+		return buttons_state.down;
+		break;
+	case Joypad::BUTTONS::LEFT:
+		return buttons_state.left;
+		break;
+	case Joypad::BUTTONS::RIGHT:
+		return buttons_state.right;
+		break;
+	case Joypad::BUTTONS::A:
+		return buttons_state.A;
+		break;
+	case Joypad::BUTTONS::B:
+		return buttons_state.B;
+		break;
+	case Joypad::BUTTONS::SELECT:
+		return buttons_state.select;
+		break;
+	case Joypad::BUTTONS::START:
+		return buttons_state.start;
+		break;
+	default:
+		break;
+	}
+}

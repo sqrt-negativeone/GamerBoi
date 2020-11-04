@@ -12,7 +12,7 @@ void CPU::reset() {
 	reg.DE.hl = 0x00D8;
 	reg.HL.hl = 0x014D;
 	reg.SP.hl = 0xFFFE;
-	reg.PC = 0x0000;
+	reg.PC = 0x0100;
 	IE = 0;
 	IME = 0;
 	bus->write(0xFFFF, 0x00);

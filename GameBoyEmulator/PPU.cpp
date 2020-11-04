@@ -7,12 +7,7 @@ PPU::PPU() {
 	mode = STATE::VBLANK;
 	coincidenceFlag = 1;
 	frame_count = 0;
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-	window = SDL_CreateWindow("Gamer Boi (Emulator)", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 432, 0);
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STATIC, 160, 144);
-	SDL_SetWindowResizable(window, SDL_TRUE);
+	
 }
 void PPU::connectBus(Bus* bus) {
 	this->bus = bus;
@@ -65,10 +60,11 @@ void PPU::turnedOff() {
 			}
 		}
 	}
-	render();
+	
 }
 
-void PPU::clock(uint8_t cycles) {
+bool PPU::clock(uint8_t cycles) {
+	bool frame_complete = false;
 	LCDC_reg.val = bus->read(LCDC);
 	uint8_t stat = bus->read(STAT);
 	curr_scanline = bus->read(LY);
@@ -76,7 +72,7 @@ void PPU::clock(uint8_t cycles) {
 	if (!LCDC_reg.lcd_on) {
 		clock_cnt = 0;
 		mode = STATE::HBLANK;
-		return;
+		return frame_complete;
 	}
 	isOff = false;
 	clock_cnt += cycles;
@@ -132,8 +128,8 @@ void PPU::clock(uint8_t cycles) {
 			}
 			if (curr_scanline == 0) {
 				//render to screen
-				render();
-				frame_count = 1 - frame_count;
+				frame_complete = true;
+				
 				mode = STATE::OAM_SEARCH;
 				doOAM_search();
 				if (stat & (1 << 2)) {
@@ -162,15 +158,10 @@ void PPU::clock(uint8_t cycles) {
 	}
 	bus->interrupt_req(req);
 
-
+	return frame_complete;
 }
 
-void PPU::render()
-{
-	SDL_UpdateTexture(texture, NULL, screen, 160 * sizeof(uint8_t) * 3);
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	SDL_RenderPresent(renderer);
-}
+
 
 
 void PPU::drawScanline() {

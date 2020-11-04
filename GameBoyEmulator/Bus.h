@@ -20,7 +20,7 @@ public:
 	void write(uint16_t addr, uint8_t data);
 	
 	void reset();
-	void clock();
+	bool clock();
 
 	void interrupt_req(uint8_t req);
 

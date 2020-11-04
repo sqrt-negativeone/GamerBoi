@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="APU.cpp" />
     <ClCompile Include="Bus.cpp" />
     <ClCompile Include="Cartridge.cpp" />
     <ClCompile Include="CPU.cpp" />
@@ -159,10 +160,11 @@
     <ClCompile Include="MBC0.cpp" />
     <ClCompile Include="MBC1.cpp" />
     <ClCompile Include="PPU.cpp" />
-    <ClCompile Include="test_cpu.cpp" />
+    <ClCompile Include="GamerBoi.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="APU.h" />
     <ClInclude Include="Bus.h" />
     <ClInclude Include="Cartridge.h" />
     <ClInclude Include="CPU.h" />

@@ -96,10 +96,10 @@ void Bus::write(uint16_t addr, uint8_t data) {
 	}
 }
 
-void Bus::clock() {
+bool Bus::clock() {
 
 	uint8_t cycles = cpu.clock();
-	ppu.clock(cycles);
+	bool frame_compete = ppu.clock(cycles);
 	if (is_dma_running) {
 		if (dma_remaining_clocks <= cycles) {
 			dma_remaining_clocks = 0;
@@ -109,9 +109,8 @@ void Bus::clock() {
 			dma_remaining_clocks -= cycles;
 		}
 	}
-	//ppu.dma->clock(cycles);
 	timer.update(cycles);
-
+	return frame_compete;
 }
 
 void Bus::interrupt_req(uint8_t req) {

@@ -25,6 +25,6 @@ Dr. Mario
 ![alt Text](https://github.com/moadfakhri/GamerBoi/blob/master/GameBoyEmulator/Images/Dr%20Mario.PNG)
 
 # TODOs:
-- [ ] Improve performance (current implementation is kinda slow)
+- [x] Improve performance (current implementation is kinda slow)
 - [ ] Implement Audio
-- [ ] Map Keyboard to Joypad
+- [ ] Add Serial input

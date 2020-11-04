@@ -30,6 +30,7 @@ public:
 
 	void connectBus(Bus* bus);
 
+	bool get_key_state(BUTTONS button);
 private:
 	void toggle_button(BUTTONS button, bool val);
 

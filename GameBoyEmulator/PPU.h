@@ -1,8 +1,7 @@
 #pragma once
-#include <SDL.h>
 #include <vector>
 using std::vector;
-#undef main
+
 class Bus;
 class PPU
 {
@@ -28,7 +27,7 @@ public :
 	PPU();
 
 	uint8_t screen[144][160][3];
-	void clock(uint8_t cycles);
+	bool clock(uint8_t cycles);
 
 	
 	
@@ -92,9 +91,7 @@ private:
 	uint16_t clock_cnt;
 	void drawScanline();
 
-	SDL_Renderer* renderer;
-	SDL_Window* window;
-	SDL_Texture* texture;
+	
 
 	Bus* bus;
 
@@ -106,7 +103,6 @@ private:
 	void drawWindow();
 	void drawSprite();
 
-	void render();
 	bool isOff;
 };
 
