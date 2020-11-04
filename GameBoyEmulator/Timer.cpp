@@ -24,11 +24,11 @@ void Timer::resetDIV() {
 uint8_t Timer::read_DIV() {
 	return (DIV >> 8);
 }
-void Timer::update() {
-	DIV += 4;
-	ticks += 4;
-	if (ticks == 16) {
-		ticks = 0;
+void Timer::update(uint8_t cycles) {
+	DIV += 4 * cycles;
+	ticks += 4 * cycles;
+	while (ticks >= 16) {
+		ticks -= 16;
 		//timer ticks happen at 1/16 CPU cycles
 		clock();
 	}

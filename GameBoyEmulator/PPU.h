@@ -1,5 +1,4 @@
 #pragma once
-#include "DMA.h"
 #include <SDL.h>
 #include <vector>
 using std::vector;
@@ -29,7 +28,7 @@ public :
 	PPU();
 
 	uint8_t screen[144][160][3];
-	void clock();
+	void clock(uint8_t cycles);
 
 	
 	
@@ -41,7 +40,6 @@ public :
 	//read and write to the VRAM or OAM tables
 	uint8_t read(uint16_t addr);
 	void write(uint16_t addr, uint8_t data);
-	DMA* dma;
 	unsigned int frame_count;
 	uint8_t get_mode();
 	uint8_t get_coincidence();

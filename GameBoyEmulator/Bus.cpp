@@ -20,7 +20,7 @@ Bus::Bus() {
 Bus::~Bus(){}
 
 uint8_t Bus::read(uint16_t addr) {
-	if (ppu.dma->is_running && (0xFF00 > addr)) {// don't read when DMA transfer
+	if (is_dma_running && (0xFF00 > addr)) {// don't read when DMA transfer
 		return 0xFF;
 	}
 	if ((0x0000 <= addr && addr < 0x8000) || (0xA000 <= addr && addr < 0xC000)) {//read from ROM or external RAM
@@ -56,8 +56,7 @@ uint8_t Bus::read(uint16_t addr) {
 	}
 }
 void Bus::write(uint16_t addr, uint8_t data) {
-	
-	if (ppu.dma->is_running && (0xFF00 > addr)) {// don't write when DMA transfer
+	if (is_dma_running && (0xFF00 > addr)) {// don't write when DMA transfer
 		return;
 	}
 	//write to ROM or external RAM (writing to rom causes the MBC to change banks)
@@ -98,11 +97,20 @@ void Bus::write(uint16_t addr, uint8_t data) {
 }
 
 void Bus::clock() {
-	cpu.clock();
-	ppu.clock();
-	ppu.dma->clock();
-	timer.update();
-	cpu.handle_intr();
+
+	uint8_t cycles = cpu.clock();
+	ppu.clock(cycles);
+	if (is_dma_running) {
+		if (dma_remaining_clocks <= cycles) {
+			dma_remaining_clocks = 0;
+			is_dma_running = false;
+		}
+		else {
+			dma_remaining_clocks -= cycles;
+		}
+	}
+	//ppu.dma->clock(cycles);
+	timer.update(cycles);
 
 }
 
@@ -121,4 +129,16 @@ void Bus::reset() {
 	ppu.reset();
 	timer.reset();
 	joypad.reset();
+	is_dma_running = false;
+}
+
+void Bus::start_dma() {
+	uint16_t start_addr = read(0xff46);
+	if (start_addr > 0xF1) return;
+	start_addr <<= 8;
+	for (int i = 0; i < 160; i++) {
+		ppu.oam[i] = read(start_addr + i);
+	}
+	is_dma_running = true;
+	dma_remaining_clocks = 160;
 }

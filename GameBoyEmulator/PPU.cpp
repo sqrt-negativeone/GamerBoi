@@ -16,7 +16,6 @@ PPU::PPU() {
 }
 void PPU::connectBus(Bus* bus) {
 	this->bus = bus;
-	dma = new DMA(bus);
 	reset();
 }
 uint8_t PPU::get_mode() {
@@ -69,7 +68,7 @@ void PPU::turnedOff() {
 	render();
 }
 
-void PPU::clock() {
+void PPU::clock(uint8_t cycles) {
 	LCDC_reg.val = bus->read(LCDC);
 	uint8_t stat = bus->read(STAT);
 	curr_scanline = bus->read(LY);
@@ -80,13 +79,13 @@ void PPU::clock() {
 		return;
 	}
 	isOff = false;
-	clock_cnt++;
+	clock_cnt += cycles;
 	switch (mode)
 	{
 	case PPU::STATE::HBLANK:
-		if (clock_cnt == HBLANK_DURATION) {
+		if (clock_cnt >= HBLANK_DURATION) {
 			drawScanline();
-			clock_cnt = 0;
+			clock_cnt -= HBLANK_DURATION;
 			bus->io_registers.inc_LY();
 			curr_scanline++;
 			if (curr_scanline == bus->read(LYC)) {
@@ -117,21 +116,11 @@ void PPU::clock() {
 		}
 		break;
 	case PPU::STATE::VBLANK:
-		if (clock_cnt == VBLANK_DURATION) {
-			//render to screen
-			frame_count = 1 - frame_count;
-			render();
-			clock_cnt = 0;
-			bus->write(LY, 0);
-			mode = STATE::OAM_SEARCH;
-			doOAM_search();
-			if (stat & (1 << 2)) {
-				req |= 2;
-			}
-		}
-		else if (clock_cnt % SCANLINE_DURATION == 0) {
+		if (clock_cnt >= SCANLINE_DURATION) {
+			clock_cnt -= SCANLINE_DURATION;
 			bus->io_registers.inc_LY();
 			curr_scanline++;
+			curr_scanline %= 154;
 			if (curr_scanline == bus->read(LYC)) {
 				coincidenceFlag = 1;
 				if (stat & (1 << 6)) {// if LYC=LC interrupt enable
@@ -141,17 +130,27 @@ void PPU::clock() {
 			else {
 				coincidenceFlag = 0;
 			}
+			if (curr_scanline == 0) {
+				//render to screen
+				render();
+				frame_count = 1 - frame_count;
+				mode = STATE::OAM_SEARCH;
+				doOAM_search();
+				if (stat & (1 << 2)) {
+					req |= 2;
+				}
+			}
 		}
 		break;
 	case PPU::STATE::OAM_SEARCH:
-		if (clock_cnt == OAM_SEARCH_DURATION) {
-			clock_cnt = 0;
+		if (clock_cnt >= OAM_SEARCH_DURATION) {
+			clock_cnt -= OAM_SEARCH_DURATION;
 			mode = STATE::LCD_TRANSFERE;
 		}
 		break;
 	case PPU::STATE::LCD_TRANSFERE:
-		if (clock_cnt == LCD_TRANSFER_DURATION) {
-			clock_cnt = 0;
+		if (clock_cnt >= LCD_TRANSFER_DURATION) {
+			clock_cnt -= LCD_TRANSFER_DURATION;
 			mode = STATE::HBLANK;
 			if (stat & (1 << 3)) {//if OAM interrupt is enable
 				req |= 2;
@@ -403,7 +402,6 @@ void PPU::doOAM_search() {
 
 
 void PPU::reset() {
-	dma->is_running = false;
 	clock_cnt = 0;
 	mode = STATE::VBLANK;
 	coincidenceFlag = 1;

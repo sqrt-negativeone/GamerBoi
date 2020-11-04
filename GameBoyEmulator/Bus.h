@@ -1,5 +1,5 @@
 #pragma once
-#include "CPU2.h"
+#include "CPU.h"
 #include "Timer.h"
 #include "Cartridge.h"
 #include "PPU.h"
@@ -29,12 +29,15 @@ public:
 	Timer timer;
 	
 	PPU ppu;
-	CPU2 cpu;
+	CPU cpu;
 	Cartridge* cartridge;
 	IORegisters io_registers;
 	Joypad joypad;
+	void start_dma();
+	uint8_t dma_remaining_clocks = 0;
 private:
 	bool is_booting;	
+	bool is_dma_running = false;
 	
 };
 

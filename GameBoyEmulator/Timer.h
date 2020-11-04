@@ -11,7 +11,7 @@ public:
 	void resetDIV();
 	uint8_t read_DIV();
 	void reset();
-	void update();
+	void update(uint8_t cycles);
 	void reset_timer_ticks();
 	uint8_t get_clockFreq();
 private:

@@ -33,7 +33,8 @@ void IORegisters::reset()
 	io_registers[0x24] = 0x77;//NR50
 	io_registers[0x25] = 0xF3;//NR51
 	io_registers[0x26] = 0xF1;//NR52
-	io_registers[0x40] = 0x91;//LCDC
+	io_registers[0x40] = 0;//LCDC
+	//io_registers[0x40] = 0x91;//LCDC
 	io_registers[0x42] = 0x00;//SCY
 	io_registers[0x43] = 0x00;//SCX
 	io_registers[0x44] = 0x00;//LY
@@ -167,7 +168,7 @@ void IORegisters::write(uint16_t addr, uint8_t data) {
 	}
 	case 0xFF46: {//DMA
 		io_registers[addr - 0xFF00] = data;
-		bus->ppu.dma->startDMA();
+		bus->start_dma();
 		break;
 	}
 	case 0xFF47:
@@ -184,7 +185,7 @@ void IORegisters::write(uint16_t addr, uint8_t data) {
 }
 
 void IORegisters::inc_LY() {
-	io_registers[0x44]++;
+	io_registers[0x44] = (io_registers[0x44] + 1) % 154;
 }
 void IORegisters::inc_DIV() {
 	io_registers[0x04]++;
