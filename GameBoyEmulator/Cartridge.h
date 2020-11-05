@@ -6,6 +6,7 @@ namespace GamerBoi {
 	{
 	public:
 		Cartridge(const char* path);
+		~Cartridge();
 		uint8_t read(uint16_t addr);
 		void write(uint16_t addr, uint8_t data);
 		std::vector<uint8_t> rom;

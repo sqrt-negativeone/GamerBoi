@@ -1,5 +1,4 @@
 #include "Cartridge.h"
-#include "stdio.h"
 #include "MBC.h"
 #include "MBC0.h"
 #include "MBC1.h"
@@ -45,7 +44,10 @@ namespace GamerBoi {
 		case 0x05: ram = new uint8_t[(1 << 16)]; break;
 		}
 	}
-
+	Cartridge::~Cartridge() {
+		delete mbc;
+		delete ram;
+	}
 	uint8_t Cartridge::read(uint16_t addr) {
 		return mbc->read(addr);
 	}

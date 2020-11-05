@@ -1,5 +1,5 @@
 #include "Bus.h"
-#include <conio.h>
+
 
 namespace GamerBoi {
 	Bus::Bus() {
@@ -123,7 +123,9 @@ namespace GamerBoi {
 	void Bus::insertCartridge(Cartridge* cartridge) {
 		this->cartridge = cartridge;
 	}
-
+	void Bus::removeCartridge() {
+		delete cartridge;
+	}
 	void Bus::reset() { 
 		cpu.reset();
 		io_registers.reset();

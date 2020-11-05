@@ -21,8 +21,6 @@ public:
 
 		bus = new Bus();
 
-		//Cartridge* cartridge = new Cartridge("ROMs/Super Mario Land (World).gb");
-		//Cartridge* cartridge = new Cartridge("ROMs/Dr. Mario.gb");
 		insertCartridge("ROMs/Tetris.gb");
 	}
 	
@@ -64,11 +62,18 @@ private:
 	}
 	
 
-	//return true if quit event happen
 	void handle_events() {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				quit = true;
+				return;
+			}
+			else if (e.type == SDL_DROPFILE) {
+				auto filePath = e.drop.file;
+				bus->removeCartridge();
+				insertCartridge(filePath);
+				SDL_free(filePath);
+				bus->reset();
 				return;
 			}
 		}

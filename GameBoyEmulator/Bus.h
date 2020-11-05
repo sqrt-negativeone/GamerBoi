@@ -26,6 +26,7 @@ namespace GamerBoi {
 		void interrupt_req(uint8_t req);
 
 		void insertCartridge(Cartridge* cartridge);
+		void removeCartridge();
 
 		Timer timer;
 	
