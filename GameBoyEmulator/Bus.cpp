@@ -1,143 +1,147 @@
 #include "Bus.h"
 #include <conio.h>
-Bus::Bus() {
-	is_booting = true;
 
-	ppu.connectBus(this);
-	cpu.connectBus(this);
-	timer.connectBus(this);
-	io_registers.connectBus(this);
-	joypad.connectBus(this);
+namespace GamerBoi {
+	Bus::Bus() {
+		is_booting = true;
 
-	memset(cpuRam, 0x00, sizeof(cpuRam));
-	memset(h_ram, 0x00, sizeof(h_ram));
-	FILE* file;
-	fopen_s(&file, "ROMs/dmg_boot.bin", "rb");
-	uint8_t pos = 0;
-	while (fread(&boot_rom[pos], 1, 1, file)) pos++;
-}
+		ppu.connectBus(this);
+		cpu.connectBus(this);
+		timer.connectBus(this);
+		io_registers.connectBus(this);
+		joypad.connectBus(this);
 
-Bus::~Bus(){}
-
-uint8_t Bus::read(uint16_t addr) {
-	if (is_dma_running && (0xFF00 > addr)) {// don't read when DMA transfer
-		return 0xFF;
+		memset(cpuRam, 0x00, sizeof(cpuRam));
+		memset(h_ram, 0x00, sizeof(h_ram));
+		FILE* file;
+		fopen_s(&file, "ROMs/dmg_boot.bin", "rb");
+		uint8_t pos = 0;
+		while (fread(&boot_rom[pos], 1, 1, file)) pos++;
 	}
-	if ((0x0000 <= addr && addr < 0x8000) || (0xA000 <= addr && addr < 0xC000)) {//read from ROM or external RAM
-		if (is_booting && addr == 0x100) is_booting = false;
-		if (is_booting && 0x0000 <= addr && addr < 0x0100) {// read from boot rom instead
-			return boot_rom[addr];
+
+	Bus::~Bus(){}
+
+	uint8_t Bus::read(uint16_t addr) {
+		if (is_dma_running && (0xFF00 > addr)) {// don't read when DMA transfer
+			return 0xFF;
 		}
-		if (cartridge) {
-			return cartridge->read(addr);
+		if ((0x0000 <= addr && addr < 0x8000) || (0xA000 <= addr && addr < 0xC000)) {//read from ROM or external RAM
+			if (is_booting && addr == 0x100) is_booting = false;
+			if (is_booting && 0x0000 <= addr && addr < 0x0100) {// read from boot rom instead
+				return boot_rom[addr];
+			}
+			if (cartridge) {
+				return cartridge->read(addr);
+			}
+			else return 0x00;
 		}
-		else return 0x00;
-	}
-	if ((0x8000 <= addr && addr < 0xA000) || (0xFE00 <= addr && addr < 0xFEA0)) {//read from VRAM or OAM tables
-		return ppu.read(addr);
-	}
-	if (0xFF00 <= addr && addr < 0xFF80) {//IO registers
-		return io_registers.read(addr);
-	}
-	if (0xFF80 <= addr && addr <= 0xFFFE) {//read from HRAM
-		return h_ram[addr - 0xFF80];
-	} 
-	if (addr == 0xFFFF) {//IE register
-		return cpu.read_IE_flag();
-	}
-	if (0xE000 <= addr && addr < 0xFE00) {//mirror of C000-CFFF
-		return read(addr - 0x2000);
-	}
-	if (0xFEA0 <= addr && addr < 0xFF00) {// not usable
-		return 0xFF;
-	}
-	if (0xC000 <= addr && addr < 0xE000) {//read from RAM
-		return cpuRam[addr - 0xC000];
-	}
-}
-void Bus::write(uint16_t addr, uint8_t data) {
-	if (is_dma_running && (0xFF00 > addr)) {// don't write when DMA transfer
-		return;
-	}
-	//write to ROM or external RAM (writing to rom causes the MBC to change banks)
-	if ((0x0000 <= addr && addr < 0x8000) || (0xA000 <= addr && addr < 0xC000)) {
-		if (is_booting) return;
-		if (cartridge) cartridge->write(addr, data);
-		return;
-	}
-
-	if ((0x8000 <= addr && addr < 0xA000) || (0xFE00 <= addr && addr < 0xFEA0)) {//write to VRAM or OAM tables
-		ppu.write(addr, data);
-		return;
-	}
-	if (addr == 0xFFFF) {//IE register
-		cpu.write_IE_flag(data);
-		return;
-	}
-	if (0xFF00 <= addr && addr < 0xFF80) {//IO registers
-		io_registers.write(addr, data);
-		return;
-	}
-	if (0xFF80 <= addr && addr < 0xFFFF) {//write to HRAM
-		h_ram[addr - 0xFF80] = data;
-		return;
-	}
-
-	if (0xE000 <= addr && addr < 0xFE00) {//mirror of C000-CFFF
-		write(addr - 0x2000,data);
-		return;
-	}
-
-	if (0xFEA0 <= addr && addr < 0xFF00) {// not usable
-		return;
-	}
-	if (0xC000 <= addr && addr < 0xE000) {// write to RAM
-		cpuRam[addr - 0xC000] = data; 
-	}
-}
-
-bool Bus::clock() {
-
-	uint8_t cycles = cpu.clock();
-	bool frame_compete = ppu.clock(cycles);
-	if (is_dma_running) {
-		if (dma_remaining_clocks <= cycles) {
-			dma_remaining_clocks = 0;
-			is_dma_running = false;
+		if ((0x8000 <= addr && addr < 0xA000) || (0xFE00 <= addr && addr < 0xFEA0)) {//read from VRAM or OAM tables
+			return ppu.read(addr);
 		}
-		else {
-			dma_remaining_clocks -= cycles;
+		if (0xFF00 <= addr && addr < 0xFF80) {//IO registers
+			return io_registers.read(addr);
+		}
+		if (0xFF80 <= addr && addr <= 0xFFFE) {//read from HRAM
+			return h_ram[addr - 0xFF80];
+		} 
+		if (addr == 0xFFFF) {//IE register
+			return cpu.read_IE_flag();
+		}
+		if (0xE000 <= addr && addr < 0xFE00) {//mirror of C000-CFFF
+			return read(addr - 0x2000);
+		}
+		if (0xFEA0 <= addr && addr < 0xFF00) {// not usable
+			return 0xFF;
+		}
+		if (0xC000 <= addr && addr < 0xE000) {//read from RAM
+			return cpuRam[addr - 0xC000];
 		}
 	}
-	timer.update(cycles);
-	return frame_compete;
-}
+	void Bus::write(uint16_t addr, uint8_t data) {
+		if (is_dma_running && (0xFF00 > addr)) {// don't write when DMA transfer
+			return;
+		}
+		//write to ROM or external RAM (writing to rom causes the MBC to change banks)
+		if ((0x0000 <= addr && addr < 0x8000) || (0xA000 <= addr && addr < 0xC000)) {
+			if (is_booting) return;
+			if (cartridge) cartridge->write(addr, data);
+			return;
+		}
 
-void Bus::interrupt_req(uint8_t req) {
-	uint8_t IF = io_registers.read(0xFF0F);
-	io_registers.write(0xFF0F, IF | req);
-}
+		if ((0x8000 <= addr && addr < 0xA000) || (0xFE00 <= addr && addr < 0xFEA0)) {//write to VRAM or OAM tables
+			ppu.write(addr, data);
+			return;
+		}
+		if (addr == 0xFFFF) {//IE register
+			cpu.write_IE_flag(data);
+			return;
+		}
+		if (0xFF00 <= addr && addr < 0xFF80) {//IO registers
+			io_registers.write(addr, data);
+			return;
+		}
+		if (0xFF80 <= addr && addr < 0xFFFF) {//write to HRAM
+			h_ram[addr - 0xFF80] = data;
+			return;
+		}
 
-void Bus::insertCartridge(Cartridge* cartridge) {
-	this->cartridge = cartridge;
-}
+		if (0xE000 <= addr && addr < 0xFE00) {//mirror of C000-CFFF
+			write(addr - 0x2000,data);
+			return;
+		}
 
-void Bus::reset() { 
-	cpu.reset();
-	io_registers.reset();
-	ppu.reset();
-	timer.reset();
-	joypad.reset();
-	is_dma_running = false;
-}
-
-void Bus::start_dma() {
-	uint16_t start_addr = read(0xff46);
-	if (start_addr > 0xF1) return;
-	start_addr <<= 8;
-	for (int i = 0; i < 160; i++) {
-		ppu.oam[i] = read(start_addr + i);
+		if (0xFEA0 <= addr && addr < 0xFF00) {// not usable
+			return;
+		}
+		if (0xC000 <= addr && addr < 0xE000) {// write to RAM
+			cpuRam[addr - 0xC000] = data; 
+		}
 	}
-	is_dma_running = true;
-	dma_remaining_clocks = 160;
+
+	bool Bus::clock() {
+
+		uint8_t cycles = cpu.clock();
+		bool frame_compete = ppu.clock(cycles);
+		if (is_dma_running) {
+			if (dma_remaining_clocks <= cycles) {
+				dma_remaining_clocks = 0;
+				is_dma_running = false;
+			}
+			else {
+				dma_remaining_clocks -= cycles;
+			}
+		}
+		timer.update(cycles);
+		return frame_compete;
+	}
+
+	void Bus::interrupt_req(uint8_t req) {
+		uint8_t IF = io_registers.read(0xFF0F);
+		io_registers.write(0xFF0F, IF | req);
+	}
+
+	void Bus::insertCartridge(Cartridge* cartridge) {
+		this->cartridge = cartridge;
+	}
+
+	void Bus::reset() { 
+		cpu.reset();
+		io_registers.reset();
+		ppu.reset();
+		timer.reset();
+		joypad.reset();
+		is_dma_running = false;
+	}
+
+	void Bus::start_dma() {
+		uint16_t start_addr = read(0xff46);
+		if (start_addr > 0xF1) return;
+		start_addr <<= 8;
+		for (int i = 0; i < 160; i++) {
+			ppu.oam[i] = read(start_addr + i);
+		}
+		is_dma_running = true;
+		dma_remaining_clocks = 160;
+	}
+
 }
