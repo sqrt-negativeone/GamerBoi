@@ -35,14 +35,22 @@ namespace GamerBoi {
 		}
 	
 		uint8_t ram_type = rom[0x0149];
+		int ram_size = 0;
 		switch (ram_type) {
 		case 0x00: break;
-		case 0x01: ram = new uint8_t[(1<<11)]; break;
-		case 0x02: ram = new uint8_t[(1 << 13)]; break;
-		case 0x03: ram = new uint8_t[(1<<15)]; break;
-		case 0x04: ram = new uint8_t[(1 << 17)]; break;
-		case 0x05: ram = new uint8_t[(1 << 16)]; break;
+		case 0x01: 
+			ram = new uint8_t[(1 << 11)]; 
+			ram_size = (1 << 11); 
+			break;
+		case 0x02: 
+			ram = new uint8_t[(1 << 13)]; 
+			ram_size = (1 << 13); 
+			break;
+		case 0x03: ram = new uint8_t[(1 << 15)]; ram_size = (1 << 15); break;
+		case 0x04: ram = new uint8_t[(1 << 17)]; ram_size = (1 << 17); break;
+		case 0x05: ram = new uint8_t[(1 << 16)]; ram_size = (1 << 16); break;
 		}
+		mbc->set_ram_size(ram_size);
 	}
 	Cartridge::~Cartridge() {
 		delete mbc;
