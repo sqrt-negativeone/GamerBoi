@@ -12,18 +12,26 @@ namespace GamerBoi {
 		reg.DE.hl = 0x00D8;
 		reg.HL.hl = 0x014D;
 		reg.SP.hl = 0xFFFE;
-		reg.PC = 0x0100;
-		IE = 0;
+		reg.PC = 0x0000;
+		write_IE_flag(0);
+		write_IF_flag(0);
 		IME = 0;
 		bus->write(0xFFFF, 0x00);
 	}
 
 	uint8_t CPU::read_IE_flag() {
-		write_IE_flag(IE);
-		return IE;
+		return IE.val;
 	}
 	void CPU::write_IE_flag(uint8_t data) {
-		IE = (data & 0x1F);
+		IE.val = data;
+		IE._ = 0;
+	}
+	uint8_t CPU::read_IF_flag() {
+		return IF.val;
+	}
+	void CPU::write_IF_flag(uint8_t data) {
+		IF.val = data;
+		IF._ = 0x7;
 	}
 
 	uint8_t CPU::read(uint16_t addr) {
@@ -53,12 +61,11 @@ namespace GamerBoi {
 
 
 	void CPU::handle_intr() {
-		uint8_t IE = read(0xFFFF); // Get Interrupt Enable flag
-		uint8_t IF = read(0xFF0F); // Get Interrupt Flag
+		
 	
 		if (IME) {
 
-			if (IE & IF & 0x1F)
+			if (IE.val & IF.val & 0x1F)
 			{
 				is_halt = 0;
 
@@ -67,54 +74,50 @@ namespace GamerBoi {
 			}
 			else return;
 
-			if ((IE & IF & 0x01)) { // V-Blank Interrupt 
-				IF &= ~(0x01); // Reset the flag
+			if (IE.vblank & IF.vblank) { // V-Blank Interrupt 
+				IF.vblank = 0; // Reset the flag
 				IME = 0; // Clear IME flag
 				write(--reg.SP.hl, reg.PC >> 8); //push the PC to stack
 				write(--reg.SP.hl, (reg.PC & 0x00FF));
 				reg.PC = 0x0040; //jump to interrupt location
-				write(0xFF0F, IF);
 			}
 
-			else if ((IE & IF & 0x02)) { // LCD STAT Interrupt 
-				IF &= ~(0x02);
+			else if (IE.lcd_stat & IF.lcd_stat) { // LCD STAT Interrupt 
+				IF.lcd_stat = 0;
 				IME = 0;
 				write(--reg.SP.hl, reg.PC >> 8);
 				write(--reg.SP.hl, (reg.PC & 0x00FF));
 				reg.PC = 0x0048;
-				write(0xFF0F, IF);
 			}
-			else if ((IE & IF & 0x04)) { // Timer Interrupt 
-				IF &= ~(0x04);
+			else if (IE.timer & IF.timer) { // Timer Interrupt 
+				IF.timer = 0;
 				IME = 0;
 				write(--reg.SP.hl, reg.PC >> 8);
 				write(--reg.SP.hl, (reg.PC & 0x00FF));
 				reg.PC = 0x0050;
-				write(0xFF0F, IF);
 			}
-			else if ((IE & IF & 0x08)) { // Serial Interrupt 
-				IF &= ~(0x08);
+			else if (IE.serial & IF.serial) { // Serial Interrupt 
+				IF.serial = 0;
 				IME = 0;
 				write(--reg.SP.hl, reg.PC >> 8);
 				write(--reg.SP.hl, (reg.PC & 0x00FF));
 				reg.PC = 0x0058;
-				write(0xFF0F, IF);
 			}
-			else if ((IE & IF & 0x10)) { // Joypad Interrupt 
-				IF &= ~(0x10);
+			else if (IE.joypad & IF.joypad) { // Joypad Interrupt 
+				IF.joypad = 0;
 				IME = 0;
 				write(--reg.SP.hl, reg.PC >> 8);
 				write(--reg.SP.hl, (reg.PC & 0x00FF));
 				reg.PC = 0x0060;
-				write(0xFF0F, IF);
 			}
 		}
 		else {
-			if (is_halt && (IE & IF & 0x1F)) {
+			if (is_halt && (IE.val & IF.val & 0x1F)) {
 				is_halt = false;
 			}
 		}
 	}
+
 	uint8_t CPU::exec_opcode() {
 		uint8_t cycles = 0;
 		uint8_t p = (op.y >> 1);
@@ -184,52 +187,62 @@ namespace GamerBoi {
 		}
 		case 0x02:
 		{// LD (BC),A
+			cycles = 2;
 			write(reg.BC.hl, reg.AF.h);
 			break;
 		}
 		case 0x12:
 		{// LD (DE),A
+			cycles = 2;
 			write(reg.DE.hl, reg.AF.h);
 			break;
 		}
 		case 0x22:
 		{//LD (HL+),A
+			cycles = 2;
 			write(reg.HL.hl++, reg.AF.h);
 			break;
 
 		}
 		case 0x32:
 		{//LD (HL-),A
+			cycles = 2;
 			write(reg.HL.hl--, reg.AF.h);
 			break;
 		}
 		case 0x0A:
 		{//LD A,(BC)
+			cycles = 2;
 			reg.AF.h = read(reg.BC.hl);
 			break;
 		}
 		case 0x1A:
 		{//LD A,(DE)
+			cycles = 2;
 			reg.AF.h = read(reg.DE.hl);
 			break;
 		}
 		case 0x2A:
 		{//LD A,(HL+)
+			cycles = 2;
 			reg.AF.h = read(reg.HL.hl++);
 			break;
 		}
 		case 0x3A:
 		{//LD A,(HL-)
+			cycles = 2;
 			reg.AF.h = read(reg.HL.hl--);
 			break;
 		}
 		case 0x03: case 0x13: case 0x23: case 0x33:
 		{// INC rp[p]
+			cycles = 2;
 			(*rp[p])++;
 			break;
 		}
 		case 0x0B: case 0x1B: case 0x2B: case 0x3B:
-		{// INC rp[p]
+		{// DEC rp[p]
+			cycles = 2;
 			(*rp[p])--;
 			break;
 		}
@@ -651,6 +664,7 @@ namespace GamerBoi {
 		}
 		return cycles;
 	}
+	
 	uint8_t CPU::exec_prefixed() {
 		uint8_t cycles = 2;
 		if (r[op.z] == nullptr) cycles = 4;

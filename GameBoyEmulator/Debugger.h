@@ -8,7 +8,7 @@ namespace GamerBoi {
 	public:
 		Debugger();
 
-		void start();
+		void step();
 		void setBreakPoint(uint16_t bp);
 		void removeBreakPoint(uint16_t bp);
 		void run();
@@ -24,8 +24,8 @@ namespace GamerBoi {
 		void reset();
 		void showHRam();
 		void readMemory(uint16_t addr, uint16_t nbytes);
-	private:
 		Bus* bus;
+	private:
 		std::set<uint16_t> breakpoints;
 
 		char* choices_buff;

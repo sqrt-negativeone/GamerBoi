@@ -12,20 +12,29 @@ namespace GamerBoi {
 		void reset();
 		void update(uint8_t cycles);
 		void reset_timer_ticks();
-		uint8_t get_clockFreq();
-	private:
-		void clock();
+		uint16_t get_clockFreq();
+		void write(uint16_t addr, uint8_t data);
+		uint8_t read(uint16_t addr);
 
-		uint16_t ticks = 0;
+	private:
+
 		uint16_t timer_ticks = 0;
+		uint16_t divider_ticks = 0;
 		Bus* bus;
 		uint16_t DIV = 0;
-		uint16_t TIMA = 0xFF05;
-		uint16_t TMA = 0xFF06; 
-		uint16_t TAC = 0xFF07;
+		uint8_t TIMA = 0;
+		uint8_t TMA = 0; 
+		union {
+			uint8_t val;
+			struct {
+				uint8_t clock_select : 2;
+				uint8_t timer_enable : 1;
+				uint8_t _ : 5;
+			};
+		} TAC;
 
-		static constexpr uint8_t freqs[] = {
-			64,1,4,16
+		static constexpr uint16_t freqs[] = {
+			1024,16,64,256
 		};
 	};
 

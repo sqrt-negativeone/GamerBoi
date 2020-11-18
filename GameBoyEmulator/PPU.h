@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
+#include <functional>
 using std::vector;
 
-//class Bus;
+class GameBoy;
 namespace GamerBoi {
 	class Bus;
 	class PPU
@@ -45,7 +46,24 @@ namespace GamerBoi {
 		uint8_t get_mode();
 		uint8_t get_coincidence();
 		void turnedOff();
+		void SetFrameCompleteCallback(std::function<void()> callback) {
+			frameCompleted_callback = callback;
+		}
+		uint8_t read_register(uint16_t addr);
+		void write_register(uint16_t addr, uint8_t data);
 	private:
+		union {
+			uint8_t val;
+			struct {
+				uint8_t mode_flag : 2;
+				uint8_t coincidence_flag : 1;
+				uint8_t hblank_interrupt : 1;
+				uint8_t vblank_interrupt : 1;
+				uint8_t oam_interrupt : 1;
+				uint8_t coincidence_interrupt : 1;
+				uint8_t _ : 1;
+			};
+		} STAT_reg;
 		union {
 			uint8_t val;
 			struct {
@@ -66,14 +84,30 @@ namespace GamerBoi {
 			OAM_SEARCH,
 			LCD_TRANSFERE
 		};
-		uint16_t STAT = 0xFF41; //stat register (R/W)
-		uint16_t LCDC = 0XFF40; //LCD Control register (R/W)
-		uint16_t SCY = 0xFF42; // scroll Y (R/W)
-		uint16_t SCX = 0xFF43; // scroll X (R/W)
-		uint16_t LY = 0xFF44; // LCD current Scanline (R)
-		uint16_t LYC = 0xFF45; // LY compare (R/W)
-		uint16_t winY = 0xFF4A; // window Y position 
-		uint16_t winX = 0xFF4B; // window X position (+7 so substruct 7 to get the X pos)
+		enum class ADRESSES
+		{
+			STAT = 0xFF41, //stat register (R/W)
+			LCDC = 0XFF40, //LCD Control register (R/W)
+			SCY = 0xFF42, // scroll Y (R/W)
+			SCX = 0xFF43, // scroll X (R/W)
+			LY = 0xFF44, // LCD current Scanline (R)
+			LYC = 0xFF45, // LY compare (R/W)
+			winY = 0xFF4A, // window Y position 
+			winX = 0xFF4B,// window X position (+7 so substruct 7 to get the X pos)
+			BGP = 0xFF47,
+			OBP0 = 0xFF48,
+			OBP1 = 0xFF49
+		};
+		struct {
+			uint8_t background;
+			uint8_t ob0;
+			uint8_t ob1;
+		} palettes;
+		uint8_t SCY;
+		uint8_t SCX;
+		uint8_t LYC;
+		uint8_t winY;
+		uint8_t winX;
 
 		const uint8_t HBLANK_DURATION = 51;
 		const uint8_t LCD_TRANSFER_DURATION = 43;
@@ -89,11 +123,11 @@ namespace GamerBoi {
 			TRANSPARANT
 		};
 		STATE mode;
-		uint8_t coincidenceFlag;
+		//uint8_t coincidenceFlag;
 		uint16_t clock_cnt;
 		void drawScanline();
 
-	
+		std::function<void()> frameCompleted_callback;
 
 		Bus* bus;
 
@@ -104,7 +138,7 @@ namespace GamerBoi {
 		void drawBackground();
 		void drawWindow();
 		void drawSprite();
-
+		void inc_LY();
 		bool isOff;
 	};
 

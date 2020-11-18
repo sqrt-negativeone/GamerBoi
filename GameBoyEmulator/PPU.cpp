@@ -3,10 +3,21 @@
 #include <algorithm>
 namespace GamerBoi {
 
-	PPU::PPU() {
+	PPU::PPU() :
+		SCY{ 0 },
+		SCX{ 0 },
+		curr_scanline{ 0 },
+		LYC{ 0 },
+		winX{ 0 },
+		winY{ 0 }
+	{
+		palettes.background = 0xFC;
+		palettes.ob0 = 0xFF;
+		palettes.ob1 = 0xFF;
+
+		LCDC_reg.val = 0x00;
 		clock_cnt = 0;
 		mode = STATE::VBLANK;
-		coincidenceFlag = 1;
 		frame_count = 0;
 
 	}
@@ -18,7 +29,7 @@ namespace GamerBoi {
 		return static_cast<int>(this->mode);
 	}
 	uint8_t PPU::get_coincidence() {
-		return this->coincidenceFlag;
+		return this->STAT_reg.coincidence_flag;
 	}
 	uint8_t PPU::read(uint16_t addr) {
 		if (0x8000 <= addr && addr < 0xA000) {//VRAM read
@@ -46,13 +57,91 @@ namespace GamerBoi {
 			}
 		}
 	}
-
+	uint8_t PPU::read_register(uint16_t addr) {
+		auto ADDR = static_cast<ADRESSES>(addr);
+		switch (ADDR)
+		{
+		case GamerBoi::PPU::ADRESSES::STAT:
+			STAT_reg.mode_flag = static_cast<int>(this->mode);
+			return STAT_reg.val;
+		case GamerBoi::PPU::ADRESSES::LCDC:
+			return LCDC_reg.val;
+		case GamerBoi::PPU::ADRESSES::SCY:
+			return SCY;
+		case GamerBoi::PPU::ADRESSES::SCX:
+			return SCX;
+		case GamerBoi::PPU::ADRESSES::LY:
+			return curr_scanline;
+		case GamerBoi::PPU::ADRESSES::LYC:
+			return LYC;
+		case GamerBoi::PPU::ADRESSES::winY:
+			return winY;
+		case GamerBoi::PPU::ADRESSES::winX:
+			return winX;
+		case GamerBoi::PPU::ADRESSES::BGP:
+			return palettes.background;
+		case GamerBoi::PPU::ADRESSES::OBP0:
+			return palettes.ob0;
+		case GamerBoi::PPU::ADRESSES::OBP1:
+			return palettes.ob1;
+		default:
+			break;
+		}
+	}
+	void PPU::write_register(uint16_t addr, uint8_t data) {
+		auto ADDR = static_cast<ADRESSES>(addr);
+		switch (ADDR)
+		{
+		case GamerBoi::PPU::ADRESSES::STAT:
+			STAT_reg.hblank_interrupt = ((data & (1 << 3)) > 0);
+			STAT_reg.vblank_interrupt = ((data & (1 << 4)) > 0);
+			STAT_reg.oam_interrupt = ((data & (1 << 5)) > 0);
+			STAT_reg.coincidence_interrupt = ((data & (1 << 6)) > 0);
+			break;
+		case GamerBoi::PPU::ADRESSES::LCDC:
+			LCDC_reg.val = data;
+			if (LCDC_reg.bg_display == 0) LCDC_reg.WD_display = 0;
+			if (!LCDC_reg.lcd_on && !isOff) {
+				curr_scanline = 0;
+				turnedOff();
+			}
+			break;
+		case GamerBoi::PPU::ADRESSES::SCY:
+			SCY = data;
+			break;
+		case GamerBoi::PPU::ADRESSES::SCX:
+			SCX = data;
+			break;
+		case GamerBoi::PPU::ADRESSES::LY:
+			curr_scanline = 0;
+			break;
+		case GamerBoi::PPU::ADRESSES::LYC:
+			LYC = data;
+			break;
+		case GamerBoi::PPU::ADRESSES::winY:
+			winY = data;
+			break;
+		case GamerBoi::PPU::ADRESSES::winX:
+			winX = data;
+			break;
+		case GamerBoi::PPU::ADRESSES::BGP:
+			palettes.background = data;
+			break;
+		case GamerBoi::PPU::ADRESSES::OBP0:
+			palettes.ob0 = data;
+			break;
+		case GamerBoi::PPU::ADRESSES::OBP1:
+			palettes.ob1 = data;
+			break;
+		default:
+			break;
+		}
+	}
 	void PPU::turnedOff() {
 		if (isOff) return;
 		isOff = true;
-
-		curr_scanline = 0;
-		coincidenceFlag = (curr_scanline == bus->read(LYC));
+		
+		STAT_reg.coincidence_flag = (curr_scanline == LYC);
 
 		for (int i = 0; i < 144; i++) {
 			for (int j = 0; j < 160; j++) {
@@ -63,12 +152,11 @@ namespace GamerBoi {
 		}
 
 	}
-
+	void PPU::inc_LY() {
+		++curr_scanline %= 154;
+	}
 	bool PPU::clock(uint8_t cycles) {
 		bool frame_complete = false;
-		LCDC_reg.val = bus->read(LCDC);
-		uint8_t stat = bus->read(STAT);
-		curr_scanline = bus->read(LY);
 		uint8_t req = 0;
 		if (!LCDC_reg.lcd_on) {
 			clock_cnt = 0;
@@ -83,31 +171,30 @@ namespace GamerBoi {
 			if (clock_cnt >= HBLANK_DURATION) {
 				drawScanline();
 				clock_cnt -= HBLANK_DURATION;
-				bus->io_registers.inc_LY();
-				curr_scanline++;
-				if (curr_scanline == bus->read(LYC)) {
-					coincidenceFlag = 1;
-					if (stat & (1 << 6)) {// if LYC=LC interrupt enable
-						req |= 2;
+				inc_LY();
+				if (curr_scanline == LYC) {
+					STAT_reg.coincidence_flag = 1;
+					if (STAT_reg.coincidence_interrupt) {// if LYC=LC interrupt enable
+						req |= LCD_STAT_INTERRUPT;
 					}
 				}
 				else {
-					coincidenceFlag = 0;
+					STAT_reg.coincidence_flag = 0;
 				}
 				if (curr_scanline == VBLANK_START) {
 					mode = STATE::VBLANK;
 					//request V-Blank interrupt
-					req |= 1;
-					if (stat & (1 << 4)) {
-						req |= 2;
+					req |= VBLANK_INTERRUPT;
+					if (STAT_reg.vblank_interrupt) {
+						req |= LCD_STAT_INTERRUPT;
 					}
 
 				}
 				else {
 					mode = STATE::OAM_SEARCH;
 					doOAM_search();
-					if (stat & (1 << 5)) {//if OAM interrupt is enable
-						req |= 2;
+					if (STAT_reg.oam_interrupt) {
+						req |= LCD_STAT_INTERRUPT;
 					}
 				}
 			}
@@ -115,26 +202,25 @@ namespace GamerBoi {
 		case PPU::STATE::VBLANK:
 			if (clock_cnt >= SCANLINE_DURATION) {
 				clock_cnt -= SCANLINE_DURATION;
-				bus->io_registers.inc_LY();
-				curr_scanline++;
-				curr_scanline %= 154;
-				if (curr_scanline == bus->read(LYC)) {
-					coincidenceFlag = 1;
-					if (stat & (1 << 6)) {// if LYC=LC interrupt enable
-						req |= 2;
+				inc_LY();
+				if (curr_scanline == LYC) {
+					STAT_reg.coincidence_flag = 1;
+					if (STAT_reg.coincidence_interrupt) {
+						req |= LCD_STAT_INTERRUPT;
 					}
 				}
 				else {
-					coincidenceFlag = 0;
+					STAT_reg.coincidence_flag = 0;
 				}
 				if (curr_scanline == 0) {
 					//render to screen
+					if (frameCompleted_callback) frameCompleted_callback();
 					frame_complete = true;
 
 					mode = STATE::OAM_SEARCH;
 					doOAM_search();
-					if (stat & (1 << 2)) {
-						req |= 2;
+					if (STAT_reg.oam_interrupt) {
+						req |= LCD_STAT_INTERRUPT;
 					}
 				}
 			}
@@ -149,7 +235,7 @@ namespace GamerBoi {
 			if (clock_cnt >= LCD_TRANSFER_DURATION) {
 				clock_cnt -= LCD_TRANSFER_DURATION;
 				mode = STATE::HBLANK;
-				if (stat & (1 << 3)) {//if OAM interrupt is enable
+				if (STAT_reg.hblank_interrupt) {
 					req |= 2;
 				}
 			}
@@ -195,12 +281,10 @@ namespace GamerBoi {
 		}
 	}
 	void PPU::drawBackground() {
-		uint8_t curr_line = bus->read(SCY) + curr_scanline;
-		uint8_t curr_x = bus->read(SCX);
+		uint8_t curr_line = SCY + curr_scanline;
+		uint8_t curr_x = SCX;
 		uint8_t tileY = curr_line / 8;
 		uint8_t line_tiles[32];
-		uint8_t palette = bus->read(0xFF47);
-
 		uint16_t tilemap_select = ((LCDC_reg.BG_tilemap) == 0) ? 0x9800 : 0x9C00;
 		uint16_t tiledata_base = (LCDC_reg.BG_WD_tiledata) ? 0x8000 : 0x9000;
 
@@ -228,10 +312,10 @@ namespace GamerBoi {
 				uint8_t color_num = ((c2 << 1) | c1);
 				COLOR color;
 				switch (color_num) {
-				case 0: color = static_cast<COLOR>(palette & 0x03); break;
-				case 1: color = static_cast<COLOR>(((palette & 0x0C) >> 2)); break;
-				case 2: color = static_cast<COLOR>(((palette & 0x30) >> 4)); break;
-				case 3: color = static_cast<COLOR>(((palette & 0xC0) >> 6)); break;
+				case 0: color = static_cast<COLOR>(palettes.background & 0x03); break;
+				case 1: color = static_cast<COLOR>(((palettes.background & 0x0C) >> 2)); break;
+				case 2: color = static_cast<COLOR>(((palettes.background & 0x30) >> 4)); break;
+				case 3: color = static_cast<COLOR>(((palettes.background & 0xC0) >> 6)); break;
 				}
 				lineBuffer[pixle_count] = color;
 			}
@@ -239,9 +323,8 @@ namespace GamerBoi {
 	}
 
 	void PPU::drawWindow() {
-		uint8_t WX = bus->read(winX);
-		uint8_t WY = bus->read(winY);
-		uint8_t palette = bus->read(0xFF47);
+		uint8_t WX = winX;
+		uint8_t WY = winY;
 
 		uint8_t line_tiles[32];
 		if (WY <= curr_scanline && WX > 6 && WX <= 166) {//visible line
@@ -268,10 +351,10 @@ namespace GamerBoi {
 					uint8_t color_num = (c2 << 1) | c1;
 					COLOR color;
 					switch (color_num) {
-					case 0: color = static_cast<COLOR>(palette & 0x03); break;
-					case 1: color = static_cast<COLOR>(((palette & 0x0C) >> 2)); break;
-					case 2: color = static_cast<COLOR>(((palette & 0x30) >> 4)); break;
-					case 3: color = static_cast<COLOR>(((palette & 0xC0) >> 6)); break;
+					case 0: color = static_cast<COLOR>(palettes.background & 0x03); break;
+					case 1: color = static_cast<COLOR>(((palettes.background & 0x0C) >> 2)); break;
+					case 2: color = static_cast<COLOR>(((palettes.background & 0x30) >> 4)); break;
+					case 3: color = static_cast<COLOR>(((palettes.background & 0xC0) >> 6)); break;
 					}
 					lineBuffer[pixle_count] = color;
 				}
@@ -313,7 +396,7 @@ namespace GamerBoi {
 			uint16_t addr = 0x8000 + 16 * num + 2 * row;
 			uint8_t byte1 = read(addr);
 			uint8_t byte2 = read(addr + 1);
-			uint8_t palette = (spriteBuffer[i].palette_num == 0) ? bus->read(0xFF48) : bus->read(0xFF49);//get the correct palette
+			uint8_t palette = (spriteBuffer[i].palette_num == 0) ? palettes.ob0 : palettes.ob1;//get the correct palette
 
 			bool x_mirror = spriteBuffer[i].xFlip;//X flip
 
@@ -347,7 +430,7 @@ namespace GamerBoi {
 				}
 			}
 		}
-		COLOR bg_color0 = static_cast<COLOR>(bus->read(0xFF47) & 0x03);
+		COLOR bg_color0 = static_cast<COLOR>(palettes.background & 0x03);
 		spriteBuffer.clear();
 
 		for (int i = 0; i < 160; i++) {
@@ -396,7 +479,17 @@ namespace GamerBoi {
 	void PPU::reset() {
 		clock_cnt = 0;
 		mode = STATE::VBLANK;
-		coincidenceFlag = 1;
+		STAT_reg.coincidence_flag = 1;
+		LCDC_reg.val = 0x00;
+		curr_scanline = 0;
+		LYC = 0;
+		palettes.background = 0xFC;
+		palettes.ob0 = 0xFF;
+		palettes.ob1 = 0xFF;
+		winY = 0;
+		winX = 0;
+		SCX = 0;
+		SCY = 0;
 		turnedOff();
 	}
 }

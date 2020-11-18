@@ -16,8 +16,8 @@ namespace GamerBoi {
 	
 	}
 
-	void Debugger::start() {	
-		for (;;) {
+	void Debugger::step() {	
+		//for (;;) {
 			system("cls");
 			showRegisters();
 			ShowOptions();
@@ -70,7 +70,7 @@ namespace GamerBoi {
 				int addr, l; cin >> std::hex >> addr >> std::dec >> l;
 				readMemory(addr, l);
 			}
-		}
+		//}
 	}
 	void Debugger::setBreakPoint(uint16_t bp) {
 		breakpoints.insert(bp);

@@ -43,49 +43,49 @@ namespace GamerBoi {
 		{
 		case Joypad::BUTTONS::UP:
 			if (!buttons_state.up && val) {
-				bus->interrupt_req(0x10);
+				bus->interrupt_req(JOYPAD_INTERRUPT);
 			}
 			buttons_state.up = val;
 			break;
 		case Joypad::BUTTONS::DOWN:
 			if (!buttons_state.down && val) {
-				bus->interrupt_req(0x10);
+				bus->interrupt_req(JOYPAD_INTERRUPT);
 			}
 			buttons_state.down = val;
 			break;
 		case Joypad::BUTTONS::LEFT:
 			if (!buttons_state.left && val) {
-				bus->interrupt_req(0x10);
+				bus->interrupt_req(JOYPAD_INTERRUPT);
 			}
 			buttons_state.left = val;
 			break;
 		case Joypad::BUTTONS::RIGHT:
 			if (!buttons_state.right && val) {
-				bus->interrupt_req(0x10);
+				bus->interrupt_req(JOYPAD_INTERRUPT);
 			}
 			buttons_state.right = val;
 			break;
 		case Joypad::BUTTONS::A:
 			if (!buttons_state.A && val) {
-				bus->interrupt_req(0x10);
+				bus->interrupt_req(JOYPAD_INTERRUPT);
 			}
 			buttons_state.A = val;
 			break;
 		case Joypad::BUTTONS::B:
 			if (!buttons_state.B && val) {
-				bus->interrupt_req(0x10);
+				bus->interrupt_req(JOYPAD_INTERRUPT);
 			}
 			buttons_state.B = val;
 			break;
 		case Joypad::BUTTONS::SELECT:
 			if (!buttons_state.select && val) {
-				bus->interrupt_req(0x10);
+				bus->interrupt_req(JOYPAD_INTERRUPT);
 			}
 			buttons_state.select = val;
 			break;
 		case Joypad::BUTTONS::START:
 			if (!buttons_state.start && val) {
-				bus->interrupt_req(0x10);
+				bus->interrupt_req(JOYPAD_INTERRUPT);
 			}
 			buttons_state.start = val;
 			break;

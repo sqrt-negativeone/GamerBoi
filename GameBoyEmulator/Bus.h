@@ -3,8 +3,14 @@
 #include "Timer.h"
 #include "Cartridge.h"
 #include "PPU.h"
-#include "IORegisters.h"
 #include "Joypad.h"
+#include "APU.h"
+
+constexpr auto VBLANK_INTERRUPT = 0b00001;
+constexpr auto LCD_STAT_INTERRUPT = 0b00010;
+constexpr auto TIMER_INTERRUPT = 0b00100;
+constexpr auto SERIAL_INTERRUPT = 0b01000;
+constexpr auto JOYPAD_INTERRUPT = 0b10000;
 
 namespace GamerBoi {
 	class Bus
@@ -32,15 +38,16 @@ namespace GamerBoi {
 	
 		PPU ppu;
 		CPU cpu;
+		APU apu;
+
 		Cartridge* cartridge;
-		IORegisters io_registers;
 		Joypad joypad;
 		void start_dma();
 		uint8_t dma_remaining_clocks = 0;
 	private:
 		bool is_booting;	
 		bool is_dma_running = false;
-	
+		uint8_t dma_addr;
 	};
 
 }

@@ -39,9 +39,6 @@
     <ClCompile Include="Debugger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IORegisters.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Joypad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -53,6 +50,15 @@
     </ClCompile>
     <ClCompile Include="APU.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NoiseChannel.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SquareChannel.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveChannel.h">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,9 +86,6 @@
     <ClInclude Include="Debugger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IORegisters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Joypad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -90,6 +93,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="APU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Channel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SweepSquareChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,7 +8,6 @@ namespace GamerBoi {
 		ppu.connectBus(this);
 		cpu.connectBus(this);
 		timer.connectBus(this);
-		io_registers.connectBus(this);
 		joypad.connectBus(this);
 
 		memset(cpuRam, 0x00, sizeof(cpuRam));
@@ -39,7 +38,18 @@ namespace GamerBoi {
 			return ppu.read(addr);
 		}
 		if (0xFF00 <= addr && addr < 0xFF80) {//IO registers
-			return io_registers.read(addr);
+			if (addr == 0xFF00) 
+				return joypad.read();
+			if (0xFF04 <= addr && addr <= 0xFF07) 
+				return timer.read(addr);
+			if (addr == 0xFF0F)
+				return cpu.read_IF_flag();
+			if (addr == 0xFF46)
+				return dma_addr;
+			if (0xFF40 <= addr && addr <= 0xFF4B)
+				return ppu.read_register(addr);
+			if (0xFF10 <= addr && addr < 0xFF40)
+				return apu.read(addr);
 		}
 		if (0xFF80 <= addr && addr <= 0xFFFE) {//read from HRAM
 			return h_ram[addr - 0xFF80];
@@ -72,12 +82,39 @@ namespace GamerBoi {
 			ppu.write(addr, data);
 			return;
 		}
+		if (0xC000 <= addr && addr < 0xE000) {// write to RAM
+			cpuRam[addr - 0xC000] = data;
+		}
 		if (addr == 0xFFFF) {//IE register
 			cpu.write_IE_flag(data);
 			return;
 		}
 		if (0xFF00 <= addr && addr < 0xFF80) {//IO registers
-			io_registers.write(addr, data);
+			if (addr == 0xFF00) {
+				joypad.write(data);
+				return;
+			}
+			if (0xFF04 <= addr && addr <= 0xFF07) {
+				timer.write(addr, data);
+				return;
+			}
+			if (addr == 0xFF0F) {
+				cpu.write_IF_flag(data);
+				return;
+			}
+			if (addr == 0xFF46) {
+				dma_addr = data;
+				start_dma();
+				return;
+			}
+			if (0xFF40 <= addr && addr <= 0xFF4B) {
+				ppu.write_register(addr, data);
+				return;
+			}
+			if (0xFF10 <= addr && addr < 0xFF40) {
+				apu.write(addr, data);
+				return;
+			}
 			return;
 		}
 		if (0xFF80 <= addr && addr < 0xFFFF) {//write to HRAM
@@ -93,9 +130,7 @@ namespace GamerBoi {
 		if (0xFEA0 <= addr && addr < 0xFF00) {// not usable
 			return;
 		}
-		if (0xC000 <= addr && addr < 0xE000) {// write to RAM
-			cpuRam[addr - 0xC000] = data; 
-		}
+		
 	}
 
 	bool Bus::clock() {
@@ -111,13 +146,14 @@ namespace GamerBoi {
 				dma_remaining_clocks -= cycles;
 			}
 		}
+		apu.clock(cycles);
 		timer.update(cycles);
 		return frame_compete;
 	}
 
 	void Bus::interrupt_req(uint8_t req) {
-		uint8_t IF = io_registers.read(0xFF0F);
-		io_registers.write(0xFF0F, IF | req);
+		uint8_t IF = cpu.read_IF_flag();
+		cpu.write_IF_flag(IF | req);
 	}
 
 	void Bus::insertCartridge(Cartridge* cartridge) {
@@ -128,11 +164,12 @@ namespace GamerBoi {
 	}
 	void Bus::reset() { 
 		cpu.reset();
-		io_registers.reset();
 		ppu.reset();
 		timer.reset();
 		joypad.reset();
+		apu.reset();
 		is_dma_running = false;
+		is_booting = true;
 	}
 
 	void Bus::start_dma() {

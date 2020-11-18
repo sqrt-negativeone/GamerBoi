@@ -52,6 +52,9 @@ namespace GamerBoi {
 
 		uint8_t read_IE_flag();
 		void write_IE_flag(uint8_t data);
+		uint8_t read_IF_flag();
+		void write_IF_flag(uint8_t data);
+
 		bool get_IME() {
 			return this->IME;
 		}
@@ -59,7 +62,18 @@ namespace GamerBoi {
 		bool IME; //  Interrupt Master Enable Flag 
 		bool is_halt;
 		bool is_stop;
-		uint8_t IE;
+
+		union {
+			uint8_t val;
+			struct {
+				uint8_t vblank : 1;
+				uint8_t lcd_stat : 1;
+				uint8_t timer : 1;
+				uint8_t serial : 1;
+				uint8_t joypad : 1;
+				uint8_t _ : 3;
+			};
+		} IE, IF;
 		uint8_t ime_enable_waiting = -1;
 		uint8_t ime_disable_waiting = -1;
 		Bus* bus = nullptr;
