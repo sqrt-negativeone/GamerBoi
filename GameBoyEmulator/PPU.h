@@ -30,7 +30,7 @@ namespace GamerBoi {
 		PPU();
 
 		uint8_t screen[144][160][3];
-		bool clock(uint8_t cycles);
+		void clock(uint8_t cycles);
 
 	
 	

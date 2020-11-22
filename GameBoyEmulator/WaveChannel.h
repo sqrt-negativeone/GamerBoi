@@ -1,7 +1,9 @@
 #include <cstdint>
 #include "Channel.h"
-namespace GamerBoi {
-	class WaveChannel : public Channel {
+namespace GamerBoi
+{
+	class WaveChannel : public Channel
+	{
 	public:
 		WaveChannel() :
 			Channel(),
@@ -15,17 +17,20 @@ namespace GamerBoi {
 			reg.NR3 = 0;
 			reg.NR4 = 0;
 		}
-		uint8_t read_wave_table(uint16_t addr) {
-			uint8_t table_index = 2 * (addr&0x000F);
+		uint8_t read_wave_table(uint16_t addr)
+		{
+			uint8_t table_index = 2 * (addr & 0x000F);
 			return (wave_table[table_index] << 4) | wave_table[table_index + 1];
 		}
-		void write_wave_table(uint16_t addr, uint8_t data) {
+		void write_wave_table(uint16_t addr, uint8_t data)
+		{
 			uint8_t table_index = 2 * (addr & 0x000F);
 			wave_table[table_index] = (data >> 4);
 			wave_table[table_index + 1] = (data & 0x0F);
 		}
 
-		uint8_t read(uint8_t reg_num) {
+		uint8_t read(uint8_t reg_num)
+		{
 			switch (reg_num)
 			{
 			case 0:
@@ -42,7 +47,8 @@ namespace GamerBoi {
 				break;
 			}
 		}
-		void write(uint8_t reg_num, uint8_t data) {
+		void write(uint8_t reg_num, uint8_t data)
+		{
 			switch (reg_num)
 			{
 			case 0:
@@ -59,15 +65,18 @@ namespace GamerBoi {
 				break;
 			case 4:
 				reg.NR4 = data;
-				if (reg.trigger) {
+				if (reg.trigger)
+				{
 					trigger();
 				}
 				break;
 			}
 		}
 
-		uint8_t clock() {
-			if (timer-- <= 0) {
+		uint8_t clock()
+		{
+			if (--timer <= 0)
+			{
 				timer = (2048 - get_frequency()) * 2;
 				++position_counter %= 32; //32 size of the wave table
 				current_volume = wave_table[position_counter];
@@ -87,20 +96,29 @@ namespace GamerBoi {
 					break;
 				}
 			}
-			if (!is_enable || !reg.dac_power) {
+			if (!is_enable || !reg.dac_power)
+			{
 				current_volume = 0;
 			}
 			return current_volume;
 		}
 
-		void clock_length() {
-			if (reg.length_enable && reg.length_load > 0) {
-				if (--reg.length_load == 0) {
+		void clock_length()
+		{
+			if (reg.length_enable)
+			{
+				if (reg.length_load == 0)
+				{
 					is_enable = false;
+				}
+				else
+				{
+					reg.length_load--;
 				}
 			}
 		}
-		void Disable() {
+		void Disable()
+		{
 			is_enable = false;
 			reg.NR0 = 0;
 			reg.NR1 = 0;
@@ -108,7 +126,8 @@ namespace GamerBoi {
 			reg.NR3 = 0;
 			reg.NR4 = 0;
 		}
-		void reset() {
+		void reset()
+		{
 			timer = 0;
 			current_volume = 0;
 			position_counter = 0;
@@ -120,21 +139,25 @@ namespace GamerBoi {
 			reg.NR4 = 0;
 		}
 	private:
-		void trigger() {
+		void trigger()
+		{
 			is_enable = true;
 			if (reg.length_load == 0) reg.length_load = 256;
 			timer = (2048 - get_frequency()) * 2;
 			position_counter = 0;
-			
+
 		}
-		uint16_t get_frequency() {
+		uint16_t get_frequency()
+		{
 			return (uint16_t)(reg.frequency_LSB | ((uint16_t)(reg.frequency_MSB << 8)));
 		}
-		struct {
+		struct
+		{
 			union
 			{
 				uint8_t NR0;
-				struct {
+				struct
+				{
 					uint8_t _ : 7;
 					uint8_t dac_power : 1;
 				};
@@ -147,19 +170,23 @@ namespace GamerBoi {
 			union
 			{
 				uint8_t NR2;
-				struct {
+				struct
+				{
 					uint8_t __ : 5;
 					uint8_t volum_code : 2;
 					uint8_t ___ : 1;
 				};
 			};
-			union {
+			union
+			{
 				uint8_t NR3;
 				uint8_t frequency_LSB;
 			};
-			union {
+			union
+			{
 				uint8_t NR4;
-				struct {
+				struct
+				{
 					uint8_t frequency_MSB : 3;
 					uint8_t ____ : 3;
 					uint8_t length_enable : 1;

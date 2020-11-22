@@ -1,7 +1,9 @@
 #include <cstdint>
 #include "Channel.h"
-namespace GamerBoi {
-	class NoiseChannel : public Channel {
+namespace GamerBoi
+{
+	class NoiseChannel : public Channel
+	{
 	public:
 		NoiseChannel() :
 			Channel(),
@@ -16,7 +18,8 @@ namespace GamerBoi {
 			reg.NR3 = 0;
 			reg.NR4 = 0;
 		}
-		uint8_t read(uint8_t reg_num) {
+		uint8_t read(uint8_t reg_num)
+		{
 			switch (reg_num)
 			{
 			case 0:
@@ -31,7 +34,8 @@ namespace GamerBoi {
 				return reg.NR4 | 0xBF;
 			}
 		}
-		void write(uint8_t reg_num, uint8_t data) {
+		void write(uint8_t reg_num, uint8_t data)
+		{
 			switch (reg_num)
 			{
 			case 0:
@@ -50,7 +54,8 @@ namespace GamerBoi {
 				break;
 			case 4:
 				reg.NR4 = data;
-				if (reg.trigger) {
+				if (reg.trigger)
+				{
 					trigger();
 				}
 				break;
@@ -58,13 +63,16 @@ namespace GamerBoi {
 			}
 		}
 
-		uint8_t clock() {
-			if (timer-- == 0) {
+		uint8_t clock()
+		{
+			if (timer-- == 0)
+			{
 				set_timer();
 				uint16_t xor_result = ((lfsr_register & 1) ^ ((lfsr_register & 2) >> 1));
 				lfsr_register >>= 1;
 				lfsr_register |= (xor_result << 14);
-				if (reg.lfsr_mode) {
+				if (reg.lfsr_mode)
+				{
 					lfsr_register |= (xor_result << 6);
 					lfsr_register &= 0x7F;
 				}
@@ -73,25 +81,37 @@ namespace GamerBoi {
 			return output;
 		}
 
-		void clock_length() {
-			if (reg.length_enable && reg.length_load > 0) {
-				if (--reg.length_load == 0) {
+		void clock_length()
+		{
+			if (reg.length_enable)
+			{
+				if (reg.length_load == 0)
+				{
 					is_enable = false;
+				}
+				else
+				{
+					reg.length_load--;
 				}
 			}
 		}
-		void clock_volume() {
-			if (--volume_counter <= 0) {
+		void clock_volume()
+		{
+			if (--volume_counter <= 0)
+			{
 				volume_counter = reg.period;
-				if (reg.period != 0) {
+				if (reg.period != 0)
+				{
 					int new_volume = reg.add_mode ? current_volume + 1 : current_volume - 1;
-					if (0 <= new_volume && new_volume <= 15) {
+					if (0 <= new_volume && new_volume <= 15)
+					{
 						current_volume = new_volume;
 					}
 				}
 			}
 		}
-		void Disable() {
+		void Disable()
+		{
 			is_enable = false;
 			reg.NR0 = 0;
 			reg.NR1 = 0;
@@ -99,7 +119,8 @@ namespace GamerBoi {
 			reg.NR3 = 0;
 			reg.NR4 = 0;
 		}
-		void reset() {
+		void reset()
+		{
 			volume_counter = 0;
 			output = 0;
 			is_enable = false;
@@ -114,7 +135,8 @@ namespace GamerBoi {
 			reg.NR4 = 0;
 		}
 	private:
-		void trigger() {
+		void trigger()
+		{
 			is_enable = true;
 			if (reg.length_load == 0) reg.length_load = 64;
 			set_timer();
@@ -122,7 +144,8 @@ namespace GamerBoi {
 			volume_counter = reg.period;
 			current_volume = reg.start_volume;
 		}
-		void set_timer() {
+		void set_timer()
+		{
 			uint16_t base = 0;
 			switch (reg.divisor_code)
 			{
@@ -153,7 +176,8 @@ namespace GamerBoi {
 			}
 			timer = (base << reg.clock_shift);
 		}
-		struct {
+		struct
+		{
 			union
 			{
 				uint8_t NR0;
@@ -162,7 +186,8 @@ namespace GamerBoi {
 			union
 			{
 				uint8_t NR1;
-				struct {
+				struct
+				{
 					uint8_t length_load : 6;
 					uint8_t __ : 2;
 				};
@@ -170,13 +195,15 @@ namespace GamerBoi {
 			union
 			{
 				uint8_t NR2;
-				struct {
+				struct
+				{
 					uint8_t period : 3;
 					uint8_t add_mode : 1;
 					uint8_t start_volume : 4;
 				};
 			};
-			union {
+			union
+			{
 				uint8_t NR3;
 				struct
 				{
@@ -185,9 +212,11 @@ namespace GamerBoi {
 					uint8_t clock_shift : 4;
 				};
 			};
-			union {
+			union
+			{
 				uint8_t NR4;
-				struct {
+				struct
+				{
 					uint8_t ___ : 6;
 					uint8_t length_enable : 1;
 					uint8_t trigger : 1;

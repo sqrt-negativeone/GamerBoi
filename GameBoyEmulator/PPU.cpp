@@ -155,13 +155,11 @@ namespace GamerBoi {
 	void PPU::inc_LY() {
 		++curr_scanline %= 154;
 	}
-	bool PPU::clock(uint8_t cycles) {
-		bool frame_complete = false;
+	void PPU::clock(uint8_t cycles) {
 		uint8_t req = 0;
 		if (!LCDC_reg.lcd_on) {
 			clock_cnt = 0;
 			mode = STATE::HBLANK;
-			return frame_complete;
 		}
 		isOff = false;
 		clock_cnt += cycles;
@@ -215,7 +213,6 @@ namespace GamerBoi {
 				if (curr_scanline == 0) {
 					//render to screen
 					if (frameCompleted_callback) frameCompleted_callback();
-					frame_complete = true;
 
 					mode = STATE::OAM_SEARCH;
 					doOAM_search();
@@ -245,7 +242,6 @@ namespace GamerBoi {
 		}
 		bus->interrupt_req(req);
 
-		return frame_complete;
 	}
 
 

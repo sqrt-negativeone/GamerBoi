@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
-namespace GamerBoi {
+namespace GamerBoi
+{
 
 	class Channel
 	{
@@ -15,7 +16,8 @@ namespace GamerBoi {
 		virtual void write(uint8_t reg_num, uint8_t data) = 0;
 		virtual uint8_t clock() = 0;
 		virtual void clock_length() = 0;
-		bool Is_enable() {
+		bool Is_enable()
+		{
 			return is_enable;
 		}
 		virtual void Disable() = 0;

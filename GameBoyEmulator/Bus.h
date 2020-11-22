@@ -12,7 +12,8 @@ constexpr auto TIMER_INTERRUPT = 0b00100;
 constexpr auto SERIAL_INTERRUPT = 0b01000;
 constexpr auto JOYPAD_INTERRUPT = 0b10000;
 
-namespace GamerBoi {
+namespace GamerBoi
+{
 	class Bus
 	{
 	public:
@@ -25,9 +26,9 @@ namespace GamerBoi {
 
 		uint8_t read(uint16_t addr);
 		void write(uint16_t addr, uint8_t data);
-	
+
 		void reset();
-		bool clock();
+		void clock();
 
 		void interrupt_req(uint8_t req);
 
@@ -35,7 +36,7 @@ namespace GamerBoi {
 		void removeCartridge();
 
 		Timer timer;
-	
+
 		PPU ppu;
 		CPU cpu;
 		APU apu;
@@ -45,7 +46,7 @@ namespace GamerBoi {
 		void start_dma();
 		uint8_t dma_remaining_clocks = 0;
 	private:
-		bool is_booting;	
+		bool is_booting;
 		bool is_dma_running = false;
 		uint8_t dma_addr;
 	};
