@@ -151,7 +151,7 @@ namespace GamerBoi
 		virtual void trigger()
 		{
 			is_enable = true;
-			//if (reg.length_load == 0) reg.length_load = 64;
+			if (reg.length_load == 0) reg.length_load = 64;
 			timer = (2048 - get_frequency()) * 4;
 			volume_counter = reg.period;
 			current_volume = reg.start_volume;

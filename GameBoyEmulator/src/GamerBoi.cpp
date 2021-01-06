@@ -1,5 +1,5 @@
 #include "Debugger.h"
-#include "Bus.h"
+#include "Bus/Bus.h"
 #include <SDL.h>
 #include <iostream>
 #include <chrono>
@@ -56,7 +56,7 @@ namespace GamerBoi
 			bus->apu.set_callback_function(sampleSoundReady);
 			audio = { 0 };
 			audio.freq = SAMPLE_FRAME_RATE;
-			audio.channels = 2;
+			audio.channels = CHANNEL_COUNT;
 			audio.samples = MAX_BUFFER_SIZE;
 			audio.format = AUDIO_F32SYS;
 			audio.callback = audioCallback;
@@ -87,6 +87,7 @@ namespace GamerBoi
 		std::atomic<bool> quit;
 		bool debugging;
 
+		const int CHANNEL_COUNT = 2;
 		const int SAMPLE_FRAME_RATE = 44100;
 		const int MAX_BUFFER_SIZE = 1024;
 
@@ -109,7 +110,7 @@ namespace GamerBoi
 
 		void UpdateWithSound()
 		{
-			while (audioBuffer.size() < 2ll * MAX_BUFFER_SIZE)
+			while (audioBuffer.size() < CHANNEL_COUNT *1LL* MAX_BUFFER_SIZE)
 			{
 				bus->clock();
 			}

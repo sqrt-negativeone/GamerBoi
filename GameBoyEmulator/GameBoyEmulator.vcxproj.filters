@@ -15,90 +15,90 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Bus.cpp">
+    <ClCompile Include="src\Debugger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
+    <ClCompile Include="src\GamerBoi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPU.cpp">
+    <ClCompile Include="src\CPU\CPU.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Cartridge.cpp">
+    <ClCompile Include="src\Bus\Bus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MBC.cpp">
+    <ClCompile Include="src\Video\PPU.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MBC0.cpp">
+    <ClCompile Include="src\Audio\APU.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MBC1.cpp">
+    <ClCompile Include="src\Timer\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debugger.cpp">
+    <ClCompile Include="src\Cartridge\MBC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Joypad.cpp">
+    <ClCompile Include="src\Cartridge\Cartridge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CPU.cpp">
+    <ClCompile Include="src\Cartridge\MBC0.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GamerBoi.cpp">
+    <ClCompile Include="src\Cartridge\MBC1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="APU.cpp">
+    <ClCompile Include="src\Joypad\Joypad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NoiseChannel.h">
+    <ClCompile Include="src\Audio\Channels\NoiseChannel.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="SquareChannel.h">
+    <ClCompile Include="src\Audio\Channels\SquareChannel.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="WaveChannel.h">
+    <ClCompile Include="src\Audio\Channels\WaveChannel.h">
       <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bus.h">
+    <ClInclude Include="src\Debugger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Timer.h">
+    <ClInclude Include="src\CPU\CPU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PPU.h">
+    <ClInclude Include="src\Bus\Bus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Cartridge.h">
+    <ClInclude Include="src\Video\PPU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MBC.h">
+    <ClInclude Include="src\Audio\APU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MBC0.h">
+    <ClInclude Include="src\Timer\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MBC1.h">
+    <ClInclude Include="src\Cartridge\Cartridge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Debugger.h">
+    <ClInclude Include="src\Cartridge\MBC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Joypad.h">
+    <ClInclude Include="src\Cartridge\MBC0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CPU.h">
+    <ClInclude Include="src\Cartridge\MBC1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="APU.h">
+    <ClInclude Include="src\Joypad\Joypad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Channel.h">
+    <ClInclude Include="src\Audio\Channels\Channel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SweepSquareChannel.h">
+    <ClInclude Include="src\Audio\Channels\SweepSquareChannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

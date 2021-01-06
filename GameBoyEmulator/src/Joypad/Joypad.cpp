@@ -1,5 +1,5 @@
 #include "Joypad.h"
-#include "Bus.h"
+#include "../Bus/Bus.h"
 namespace GamerBoi {
 	Joypad::Joypad() {
 		reset();

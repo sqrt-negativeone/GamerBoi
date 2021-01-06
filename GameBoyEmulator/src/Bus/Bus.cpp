@@ -3,9 +3,9 @@
 
 namespace GamerBoi
 {
-	Bus::Bus()
+	Bus::Bus() :
+		is_booting(true)
 	{
-		is_booting = true;
 
 		ppu.connectBus(this);
 		cpu.connectBus(this);
@@ -14,10 +14,6 @@ namespace GamerBoi
 
 		memset(cpuRam, 0x00, sizeof(cpuRam));
 		memset(h_ram, 0x00, sizeof(h_ram));
-		FILE* file;
-		fopen_s(&file, "ROMs/dmg_boot.bin", "rb");
-		uint8_t pos = 0;
-		while (fread(&boot_rom[pos], 1, 1, file)) pos++;
 	}
 
 	Bus::~Bus() {}
@@ -168,6 +164,13 @@ namespace GamerBoi
 
 		uint8_t cycles = cpu.clock();
 		ppu.clock(cycles);
+		update_dma(cycles);
+		apu.clock(cycles);
+		timer.update(cycles);
+	}
+
+	void Bus::update_dma(const uint8_t& cycles)
+	{
 		if (is_dma_running)
 		{
 			if (dma_remaining_clocks <= cycles)
@@ -180,8 +183,6 @@ namespace GamerBoi
 				dma_remaining_clocks -= cycles;
 			}
 		}
-		apu.clock(cycles);
-		timer.update(cycles);
 	}
 
 	void Bus::interrupt_req(uint8_t req)
@@ -192,6 +193,7 @@ namespace GamerBoi
 
 	void Bus::insertCartridge(Cartridge* cartridge)
 	{
+		if (this->cartridge != nullptr) delete this->cartridge;
 		this->cartridge = cartridge;
 	}
 	void Bus::removeCartridge()

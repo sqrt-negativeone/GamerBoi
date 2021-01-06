@@ -1,5 +1,5 @@
 #include "CPU.h"
-#include "Bus.h"
+#include "../Bus/Bus.h"
 namespace GamerBoi {
 	void CPU::connectBus(Bus* b) {
 		this->bus = b;

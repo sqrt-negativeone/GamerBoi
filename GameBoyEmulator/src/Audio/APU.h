@@ -1,10 +1,10 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-#include "SweepSquareChannel.h"
-#include "SquareChannel.h"
-#include "WaveChannel.h"
-#include "NoiseChannel.h"
+#include "Channels/SweepSquareChannel.h"
+#include "Channels/SquareChannel.h"
+#include "Channels/WaveChannel.h"
+#include "Channels/NoiseChannel.h"
 #include <functional>
 /*
 	Sound implementation is based on this resource : https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
@@ -64,7 +64,7 @@ namespace GamerBoi {
 		uint32_t samplerate_counter;
 
 		static constexpr int CLOCKS_PER_512Hz = 2048;
-		static constexpr uint32_t CPU_CLOCKS_PER_SIMPLERATE = 1048576 / 44100;
+		static constexpr uint32_t CPU_CLOCKS_PER_SAMPLERATE = 1048576 / 44100;
 
 		float output_left;
 		float output_rigth;

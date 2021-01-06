@@ -28,6 +28,7 @@ namespace GamerBoi
 	}
 	void APU::clock(uint8_t cycles)
 	{
+		//this may cause a bug if the power control is off and the audio device is waiting for sample data, it may wait endlessly
 		if (reg.power_control == 0)
 		{
 			return;
@@ -48,7 +49,7 @@ namespace GamerBoi
 			if (samplerate_counter-- == 0)
 			{
 				//sample is ready
-				samplerate_counter = CPU_CLOCKS_PER_SIMPLERATE;
+				samplerate_counter = CPU_CLOCKS_PER_SAMPLERATE;
 				mixer(sq1, sq2, wv, ns);
 				if (sampleReady_callback) sampleReady_callback(output_left, output_rigth);
 			}
@@ -171,10 +172,8 @@ namespace GamerBoi
 		{
 			clock_volume();
 		}
-		if (++frame_cycle == 8)
-		{
-			frame_cycle == 0;
-		}
+
+		++frame_cycle &= 8;
 	}
 	void APU::clock_length()
 	{

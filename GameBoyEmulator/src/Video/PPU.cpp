@@ -1,5 +1,5 @@
 #include "PPU.h"
-#include "Bus.h"
+#include "../Bus/Bus.h"
 #include <algorithm>
 namespace GamerBoi {
 

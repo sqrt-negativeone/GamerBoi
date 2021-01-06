@@ -6,6 +6,10 @@ namespace GamerBoi {
 	Cartridge::Cartridge(const char* path) {
 		FILE* file;
 		fopen_s(&file, path, "rb");
+		if (file == nullptr)
+		{
+			printf("ERROR, COULDN'T OPEN FILE : %s\n", path);
+		}
 		uint8_t data;
 		while (fread(&data, 1, 1, file)) {
 			rom.push_back(data);

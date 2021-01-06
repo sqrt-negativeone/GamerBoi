@@ -340,4 +340,4 @@ ASALocalRun/
 healthchecksdb
 
 #ROMs
-GameBoyEmulator/ROMs
+GameBoyEmulator/ROMs/**

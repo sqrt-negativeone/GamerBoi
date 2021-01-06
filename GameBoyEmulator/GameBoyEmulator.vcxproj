@@ -74,19 +74,28 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Libs\SDL2-2.0.12\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libs\SDL2-2.0.12\lib\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Libs\SDL2-2.0.12\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libs\SDL2-2.0.12\lib\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Libs\SDL2-2.0.12\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libs\SDL2-2.0.12\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\VS_dev_tools\SDL2-2.0.12\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VS_dev_tools\SDL2-2.0.12\lib\x64;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(CommonExecutablePath);</ExecutablePath>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -149,36 +158,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="APU.cpp" />
-    <ClCompile Include="Bus.cpp" />
-    <ClCompile Include="Cartridge.cpp" />
-    <ClCompile Include="CPU.cpp" />
-    <ClCompile Include="Debugger.cpp" />
-    <ClCompile Include="Joypad.cpp" />
-    <ClCompile Include="MBC.cpp" />
-    <ClCompile Include="MBC0.cpp" />
-    <ClCompile Include="MBC1.cpp" />
-    <ClCompile Include="NoiseChannel.h" />
-    <ClCompile Include="PPU.cpp" />
-    <ClCompile Include="GamerBoi.cpp" />
-    <ClCompile Include="SquareChannel.h" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="WaveChannel.h" />
+    <ClCompile Include="src\Audio\APU.cpp" />
+    <ClCompile Include="src\Bus\Bus.cpp" />
+    <ClCompile Include="src\Cartridge\Cartridge.cpp" />
+    <ClCompile Include="src\CPU\CPU.cpp" />
+    <ClCompile Include="src\Debugger.cpp" />
+    <ClCompile Include="src\Joypad\Joypad.cpp" />
+    <ClCompile Include="src\Cartridge\MBC.cpp" />
+    <ClCompile Include="src\Cartridge\MBC0.cpp" />
+    <ClCompile Include="src\Cartridge\MBC1.cpp" />
+    <ClCompile Include="src\Audio\Channels\NoiseChannel.h" />
+    <ClCompile Include="src\Video\PPU.cpp" />
+    <ClCompile Include="src\GamerBoi.cpp" />
+    <ClCompile Include="src\Audio\Channels\SquareChannel.h" />
+    <ClCompile Include="src\Timer\Timer.cpp" />
+    <ClCompile Include="src\Audio\Channels\WaveChannel.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="APU.h" />
-    <ClInclude Include="Bus.h" />
-    <ClInclude Include="Cartridge.h" />
-    <ClInclude Include="Channel.h" />
-    <ClInclude Include="CPU.h" />
-    <ClInclude Include="Debugger.h" />
-    <ClInclude Include="Joypad.h" />
-    <ClInclude Include="MBC.h" />
-    <ClInclude Include="MBC0.h" />
-    <ClInclude Include="MBC1.h" />
-    <ClInclude Include="PPU.h" />
-    <ClInclude Include="SweepSquareChannel.h" />
-    <ClInclude Include="Timer.h" />
+    <ClInclude Include="src\Audio\APU.h" />
+    <ClInclude Include="src\Bus\Bus.h" />
+    <ClInclude Include="src\Cartridge\Cartridge.h" />
+    <ClInclude Include="src\Audio\Channels\Channel.h" />
+    <ClInclude Include="src\CPU\CPU.h" />
+    <ClInclude Include="src\Debugger.h" />
+    <ClInclude Include="src\Joypad\Joypad.h" />
+    <ClInclude Include="src\Cartridge\MBC.h" />
+    <ClInclude Include="src\Cartridge\MBC0.h" />
+    <ClInclude Include="src\Cartridge\MBC1.h" />
+    <ClInclude Include="src\Video\PPU.h" />
+    <ClInclude Include="src\Audio\Channels\SweepSquareChannel.h" />
+    <ClInclude Include="src\Timer\Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

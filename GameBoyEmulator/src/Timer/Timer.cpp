@@ -1,5 +1,5 @@
 #include "Timer.h"
-#include "Bus.h"
+#include "../Bus/Bus.h"
 namespace GamerBoi {
 
 	void Timer::connectBus(Bus* bus) {

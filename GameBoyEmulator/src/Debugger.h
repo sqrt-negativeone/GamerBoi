@@ -1,6 +1,6 @@
 #pragma once
 #include <set>
-#include "Bus.h"
+#include "Bus/Bus.h"
 
 namespace GamerBoi {
 	class Debugger
